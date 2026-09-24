@@ -15,13 +15,14 @@ import { getWeatherDescription } from '@/server/weather/helpers/getWeatherDescri
 import { TWeatherData } from '@/server/weather/types'
 
 type TProps = {
+  city: string
   weather: TWeatherData
 }
 
-const WeatherDetails = ({ weather }: TProps) => {
+const WeatherDetails = ({ city, weather }: TProps) => {
   const router = useRouter()
 
-  const { city, latitude, longitude } = weather
+  const { id } = weather
   const weatherInfo = getWeatherDescription(
     weather.current.weatherCode,
     weather.current.isDay
@@ -145,11 +146,7 @@ const WeatherDetails = ({ weather }: TProps) => {
             ))}
           </Box>
         </Box>
-        <SubscriptionForm
-          city={city}
-          latitude={latitude}
-          longitude={longitude}
-        />
+        <SubscriptionForm id={id} city={city} />
       </Box>
     </PageWrapper>
   )

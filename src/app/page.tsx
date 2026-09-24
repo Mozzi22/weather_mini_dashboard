@@ -13,7 +13,7 @@ const CITIES = [
     timezone: 'Europe/Kyiv'
   },
   {
-    name: 'Kamianets-Podilskyi',
+    name: 'Kamyanets-Podilskyi',
     timezone: 'Europe/Kyiv'
   },
   {

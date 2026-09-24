@@ -7,6 +7,7 @@ export type TWeatherDay = {
 }
 
 export type TWeatherData = {
+  id: number
   city: string
   current: {
     temperature: number
@@ -17,12 +18,11 @@ export type TWeatherData = {
     isDay: boolean
   }
   forecast: TWeatherDay[]
-  latitude: string
-  longitude: string
 }
 
 export type TGeocodingResponse = {
   results?: Array<{
+    id: number
     name: string
     latitude: number
     longitude: number

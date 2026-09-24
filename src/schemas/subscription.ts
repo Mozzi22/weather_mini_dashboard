@@ -22,8 +22,7 @@ export const subscriptionSchema = z.object({
     .string()
     .regex(TIME_REGEXP, 'Time must be between 05:00 and 11:00'),
   city: z.string().trim().min(1, 'City is required'),
-  latitude: z.string().trim().min(1, 'Latitude is required'),
-  longitude: z.string().trim().min(1, 'Longitude is required')
+  id: z.number().int().positive('Id is required')
 })
 
 export type TSubscriptionFormData = z.infer<typeof subscriptionSchema>

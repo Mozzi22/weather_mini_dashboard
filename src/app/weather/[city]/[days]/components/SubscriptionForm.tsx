@@ -13,12 +13,11 @@ import {
 } from '@/schemas/subscription'
 
 type TProps = {
+  id: number
   city: string
-  latitude: string
-  longitude: string
 }
 
-const SubscriptionForm = ({ city, latitude, longitude }: TProps) => {
+const SubscriptionForm = ({ id, city }: TProps) => {
   const [serverErrors, setServerErrors] = useState<
     TSubscriptionState['errors']
   >({})
@@ -32,8 +31,7 @@ const SubscriptionForm = ({ city, latitude, longitude }: TProps) => {
   } = useForm<TSubscriptionFormData>({
     resolver: zodResolver(subscriptionSchema),
     defaultValues: {
-      latitude,
-      longitude,
+      id,
       city,
       name: '',
       phone: '',
@@ -72,9 +70,8 @@ const SubscriptionForm = ({ city, latitude, longitude }: TProps) => {
             rowGap: '1rem'
           }}
         >
+          <input type="hidden" {...register('id')} />
           <input type="hidden" {...register('city')} />
-          <input type="hidden" {...register('latitude')} />
-          <input type="hidden" {...register('longitude')} />
           <TextField
             label="Name"
             {...register('name')}

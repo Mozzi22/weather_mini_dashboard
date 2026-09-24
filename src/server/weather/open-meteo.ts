@@ -83,6 +83,7 @@ export const getWeather = async (
   const { current, daily } = weatherData
 
   return {
+    id: location.id,
     city: location.name,
     current: {
       temperature: Math.round(current.temperature_2m!),
@@ -98,8 +99,6 @@ export const getWeather = async (
       maxTemperature: Math.round(daily.temperature_2m_max[index]),
       precipitationProbability: daily.precipitation_probability_max[index],
       weatherCode: getWeatherDescription(daily.weather_code[index], true).icon
-    })),
-    latitude: String(location.latitude),
-    longitude: String(location.longitude)
+    }))
   }
 }
