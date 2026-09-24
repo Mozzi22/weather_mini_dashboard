@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 
 import SubscribedCard from '@/app/weather/[city]/subscribed/components/SubscribedCard'
@@ -9,6 +10,18 @@ import {
 } from '@/schemas/subscription'
 import { getSubscription } from '@/server/subscription'
 import { getCityWeather } from '@/server/weather/open-meteo'
+
+export const generateMetadata = async ({
+  params
+}: TProps): Promise<Metadata> => {
+  const { city } = await params
+  const rawCity = decodeURIComponent(city)
+
+  return {
+    title: `${rawCity} Weather Subscription | Weather Mini Dashboard`,
+    description: `Your daily weather forecast subscription for ${rawCity}.`
+  }
+}
 
 type TProps = {
   params: Promise<{
