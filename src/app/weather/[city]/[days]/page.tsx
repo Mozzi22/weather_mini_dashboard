@@ -38,7 +38,7 @@ const WeatherPage = async ({ params }: TProps) => {
     )
   }
 
-  return <WeatherDetails city={city} weather={weather} />
+  return <WeatherDetails weather={weather} />
 }
 
 export default WeatherPage

@@ -5,6 +5,8 @@ const backgroundColor = '#FFFFFF'
 const primaryTextColor = '#171717'
 const secondaryTextColor = '#666666'
 
+export const CARD_SHADOW = '0 4px 20px rgba(0, 0, 0, 0.1)'
+
 export const theme = createTheme({
   palette: {
     primary: {
@@ -59,16 +61,13 @@ export const theme = createTheme({
     borderRadius: 12
   },
   components: {
-    MuiOutlinedInput: {
-      styleOverrides: {
-        notchedOutline: {
-          border: 'none'
-        }
-      }
-    },
-
     MuiSelect: {
       styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-notchedOutline': {
+            border: 'none'
+          }
+        },
         select: {
           padding: 0
         }
@@ -91,6 +90,16 @@ export const theme = createTheme({
                 }
               }
             }
+          }
+        }
+      }
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          width: '100%',
+          '@media (min-width: 900px)': {
+            width: '350px'
           }
         }
       }

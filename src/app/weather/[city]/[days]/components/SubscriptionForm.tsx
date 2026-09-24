@@ -1,0 +1,137 @@
+'use client'
+
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Box, Button, TextField, Typography } from '@mui/material'
+import { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import TimeField from 'react-simple-timefield'
+
+import { subscribe, type TSubscriptionState } from '@/app/actions/subscription'
+import {
+  subscriptionSchema,
+  type TSubscriptionFormData
+} from '@/schemas/subscription'
+
+type TProps = {
+  city: string
+  latitude: string
+  longitude: string
+}
+
+const SubscriptionForm = ({ city, latitude, longitude }: TProps) => {
+  const [serverErrors, setServerErrors] = useState<
+    TSubscriptionState['errors']
+  >({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors }
+  } = useForm<TSubscriptionFormData>({
+    resolver: zodResolver(subscriptionSchema),
+    defaultValues: {
+      latitude,
+      longitude,
+      city,
+      name: '',
+      phone: '',
+      postalCode: '',
+      sendTime: '07:00'
+    }
+  })
+
+  const onSubmit = async (data: TSubscriptionFormData) => {
+    setServerErrors({})
+    setIsSubmitting(true)
+    try {
+      const result = await subscribe(data)
+
+      if (result.errors) {
+        setServerErrors(result.errors)
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <Box sx={{ width: '100%' }}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Typography variant="h2">
+          Want to stay up to date on the weather?
+        </Typography>
+        <Typography variant="body2" sx={{ marginBottom: '1rem' }}>
+          Sign up for the daily forecast - fill out the form below.
+        </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            rowGap: '1rem'
+          }}
+        >
+          <input type="hidden" {...register('city')} />
+          <input type="hidden" {...register('latitude')} />
+          <input type="hidden" {...register('longitude')} />
+          <TextField
+            label="Name"
+            {...register('name')}
+            error={!!errors.name || !!serverErrors?.name}
+            helperText={errors.name?.message ?? serverErrors?.name?.[0]}
+            disabled={isSubmitting}
+          />
+          <TextField
+            label="Phone"
+            placeholder="+380XXXXXXXXX"
+            {...register('phone')}
+            error={!!errors.phone || !!serverErrors?.phone}
+            helperText={errors.phone?.message ?? serverErrors?.phone?.[0]}
+            disabled={isSubmitting}
+          />
+          <TextField
+            label="Postal code"
+            {...register('postalCode')}
+            error={!!errors.postalCode || !!serverErrors?.postalCode}
+            helperText={
+              errors.postalCode?.message ?? serverErrors?.postalCode?.[0]
+            }
+            disabled={isSubmitting}
+          />
+          <Controller
+            name="sendTime"
+            control={control}
+            render={({ field }) => (
+              <TimeField
+                value={field.value}
+                onChange={(_, value) => {
+                  field.onChange(value)
+                }}
+                input={
+                  <TextField
+                    label="Send time"
+                    placeholder="07:00"
+                    error={!!errors.sendTime || !!serverErrors?.sendTime}
+                    helperText={
+                      errors.sendTime?.message ??
+                      serverErrors?.sendTime?.[0] ??
+                      'Available time: 05:00–11:00'
+                    }
+                    disabled={isSubmitting}
+                  />
+                }
+              />
+            )}
+          />
+
+          <Button type="submit" variant="contained" disabled={isSubmitting}>
+            {isSubmitting ? 'Submitting...' : 'Subscribe'}
+          </Button>
+        </Box>
+      </form>
+    </Box>
+  )
+}
+
+export default SubscriptionForm

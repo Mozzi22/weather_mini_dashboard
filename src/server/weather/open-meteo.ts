@@ -25,24 +25,27 @@ const fetchWithTimeout = async (url: string): Promise<Response> => {
   }
 }
 
-export const getWeather = async (
-  city: string,
-  days: number
-): Promise<TWeatherData> => {
+export const getCityWeather = async (city: string) => {
   const searchParams = new URLSearchParams({
     name: city,
     count: '1',
     language: 'en',
     format: 'json'
   })
-
   const geocodingResponse = await fetchWithTimeout(
     `${GEOCODING_API}?${searchParams}`
   )
 
   const geocodingData = (await geocodingResponse.json()) as TGeocodingResponse
 
-  const location = geocodingData.results?.[0]
+  return geocodingData.results?.[0]
+}
+
+export const getWeather = async (
+  city: string,
+  days: number
+): Promise<TWeatherData> => {
+  const location = await getCityWeather(city)
 
   if (!location) throw new Error(`City "${city}" was not found.`)
 
@@ -95,6 +98,8 @@ export const getWeather = async (
       maxTemperature: Math.round(daily.temperature_2m_max[index]),
       precipitationProbability: daily.precipitation_probability_max[index],
       weatherCode: getWeatherDescription(daily.weather_code[index], true).icon
-    }))
+    })),
+    latitude: String(location.latitude),
+    longitude: String(location.longitude)
   }
 }

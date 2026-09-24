@@ -3,14 +3,14 @@
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material'
 import { useRouter } from 'next/navigation'
 
-type Props = {
+type TProps = {
   city: string
   days: number
 }
 
 const DAYS_OPTIONS = Array.from({ length: 7 }, (_, index) => index + 1)
 
-const DaysSelect = ({ city, days }: Props) => {
+const DaysSelect = ({ city, days }: TProps) => {
   const router = useRouter()
 
   const handleChange = (event: SelectChangeEvent<number>) =>
