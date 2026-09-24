@@ -7,19 +7,21 @@ import { useRouter } from 'next/navigation'
 import { Fragment } from 'react'
 
 import DaysSelect from '@/app/weather/[city]/[days]/components/DaysSelect'
+import SubscriptionForm from '@/app/weather/[city]/[days]/components/SubscriptionForm'
 import { formatCurrentTime } from '@/helpers/formatCurrentTime'
 import { formatForecastDate } from '@/helpers/formatForecastDate'
 import { getWeatherDescription } from '@/server/weather/helpers/getWeatherDescription'
 import { TWeatherData } from '@/server/weather/types'
+import PageWrapper from '@/сomponents/PageWrapper'
 
 type TProps = {
-  city: string
   weather: TWeatherData
 }
 
-const WeatherDetails = ({ city, weather }: TProps) => {
+const WeatherDetails = ({ weather }: TProps) => {
   const router = useRouter()
 
+  const { city, latitude, longitude } = weather
   const weatherInfo = getWeatherDescription(
     weather.current.weatherCode,
     weather.current.isDay
@@ -28,7 +30,7 @@ const WeatherDetails = ({ city, weather }: TProps) => {
   const daysCount = weather.forecast.length
 
   return (
-    <Box sx={{ marginX: '1rem' }}>
+    <PageWrapper>
       <Box>
         <Button startIcon={<ArrowBackIcon />} onClick={() => router.push('/')}>
           Back
@@ -77,57 +79,79 @@ const WeatherDetails = ({ city, weather }: TProps) => {
           loading="eager"
         />
       </Box>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: { sm: '2rem', md: '4rem' },
+          rowGap: '2rem',
+          flexDirection: {
+            xs: 'column',
+            md: 'row'
+          }
+        }}
+      >
+        <Box sx={{ maxWidth: '400px', width: '100%' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography
+              variant="h2"
+              sx={{ marginRight: { xs: 0, sm: '1rem' } }}
+            >
+              {daysCount}-Day Weather Forecast
+            </Typography>
+            <DaysSelect days={daysCount} city={city} />
+          </Box>
 
-      <Box sx={{ maxWidth: '400px' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant="h2">{daysCount}-Day Weather Forecast</Typography>
-          <DaysSelect days={daysCount} city={city} />
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr 80px 40px',
+              alignItems: 'center'
+            }}
+          >
+            {weather.forecast.map((day, index) => (
+              <Fragment key={day.date}>
+                <Typography variant="body1">
+                  {formatForecastDate(day.date, index)}
+                </Typography>
+
+                <Typography
+                  variant="body2"
+                  sx={{ display: 'flex', justifyContent: 'center' }}
+                >
+                  {day.minTemperature}° / {day.maxTemperature}°
+                </Typography>
+
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center'
+                  }}
+                >
+                  <Image
+                    src={day.weatherCode}
+                    alt=""
+                    width={48}
+                    height={48}
+                    loading="eager"
+                  />
+                </Box>
+
+                <Typography variant="body2">
+                  {day.precipitationProbability}%
+                </Typography>
+              </Fragment>
+            ))}
+          </Box>
         </Box>
-
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr 80px 40px',
-            alignItems: 'center'
-          }}
-        >
-          {weather.forecast.map((day, index) => (
-            <Fragment key={day.date}>
-              <Typography variant="body1">
-                {formatForecastDate(day.date, index)}
-              </Typography>
-
-              <Typography
-                variant="body2"
-                sx={{ display: 'flex', justifyContent: 'center' }}
-              >
-                {day.minTemperature}° / {day.maxTemperature}°
-              </Typography>
-
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center'
-                }}
-              >
-                <Image
-                  src={day.weatherCode}
-                  alt=""
-                  width={48}
-                  height={48}
-                  loading="eager"
-                />
-              </Box>
-
-              <Typography variant="body2">
-                {day.precipitationProbability}%
-              </Typography>
-            </Fragment>
-          ))}
-        </Box>
+        <SubscriptionForm
+          city={city}
+          latitude={latitude}
+          longitude={longitude}
+        />
       </Box>
-    </Box>
+    </PageWrapper>
   )
 }
 
