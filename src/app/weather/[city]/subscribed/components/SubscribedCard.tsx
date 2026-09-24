@@ -11,8 +11,8 @@ import { Box, Button, Divider, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import Link from 'next/link'
 
+import PageWrapper from '@/components/PageWrapper'
 import { TSubscriptionFormData } from '@/schemas/subscription'
-import PageWrapper from '@/сomponents/PageWrapper'
 
 type TSubscribedCardProps = {
   city: string

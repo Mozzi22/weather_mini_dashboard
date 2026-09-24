@@ -8,11 +8,11 @@ import { Fragment } from 'react'
 
 import DaysSelect from '@/app/weather/[city]/[days]/components/DaysSelect'
 import SubscriptionForm from '@/app/weather/[city]/[days]/components/SubscriptionForm'
+import PageWrapper from '@/components/PageWrapper'
 import { formatCurrentTime } from '@/helpers/formatCurrentTime'
 import { formatForecastDate } from '@/helpers/formatForecastDate'
 import { getWeatherDescription } from '@/server/weather/helpers/getWeatherDescription'
 import { TWeatherData } from '@/server/weather/types'
-import PageWrapper from '@/сomponents/PageWrapper'
 
 type TProps = {
   weather: TWeatherData

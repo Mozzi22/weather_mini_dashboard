@@ -4,7 +4,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import { Box, Button, Typography } from '@mui/material'
 import Link from 'next/link'
 
-import PageWrapper from '@/сomponents/PageWrapper'
+import PageWrapper from '@/components/PageWrapper'
 
 type TProps = {
   city: string
@@ -50,7 +50,7 @@ const WithoutSubscribe = ({ city }: TProps) => (
               href={`/weather/${encodeURIComponent(city)}/3`}
               variant="contained"
             >
-              Subscribe to {city} Weather
+              Subscribe
             </Button>
           </Box>
         </Box>

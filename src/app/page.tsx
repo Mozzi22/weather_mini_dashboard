@@ -1,70 +1,112 @@
-import Image from 'next/image'
+'use client'
 
-import styles from './page.module.css'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import LocationOnIcon from '@mui/icons-material/LocationOn'
+import { Box, Card, CardContent, Typography } from '@mui/material'
+import Link from 'next/link'
 
-const Home = () => (
-  <div className={styles.page}>
-    <main className={styles.main}>
-      <Image
-        className={styles.logo}
-        src="/next.svg"
-        alt="Next.js logo"
-        width={100}
-        height={20}
-        priority
-      />
-      <div className={styles.intro}>
-        <h1>
-          To get started, edit the <code className={styles.code}>page.tsx</code>{' '}
-          file.
-        </h1>
-        <p>
-          Looking for a starting point or more instructions? Head over to{' '}
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Templates
-          </a>{' '}
-          or the{' '}
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learning
-          </a>{' '}
-          center.
-        </p>
-      </div>
-      <div className={styles.ctas}>
-        <a
-          className={styles.primary}
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+import PageWrapper from '@/components/PageWrapper'
+
+const CITIES = [
+  {
+    name: 'Kyiv',
+    timezone: 'Europe/Kyiv'
+  },
+  {
+    name: 'Kamianets-Podilskyi',
+    timezone: 'Europe/Kyiv'
+  },
+  {
+    name: 'Toronto',
+    timezone: 'America/Toronto'
+  }
+]
+
+const HomePage = () => {
+  return (
+    <PageWrapper>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '2rem',
+          width: '100%'
+        }}
+      >
+        <Box>
+          <Typography variant="h1">Weather Forecast</Typography>
+          <Typography variant="body1" sx={{ color: 'text.secondary', mt: 1 }}>
+            Choose the city to see the current weather and forecast.
+          </Typography>
+        </Box>
+
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              sm: 'repeat(2, 1fr)',
+              md: 'repeat(3, 1fr)'
+            },
+            gap: '1.5rem'
+          }}
         >
-          <Image
-            className={styles.logo}
-            src="/vercel.svg"
-            alt="Vercel logomark"
-            width={16}
-            height={14}
-          />
-          Deploy Now
-        </a>
-        <a
-          className={styles.secondary}
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Documentation
-        </a>
-      </div>
-    </main>
-  </div>
-)
+          {CITIES.map((city) => (
+            <Card
+              key={city.name}
+              component={Link}
+              href={`/weather/${encodeURIComponent(city.name)}/3`}
+              sx={{
+                '&:hover': {
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)'
+                }
+              }}
+            >
+              <CardContent
+                sx={{
+                  display: 'flex',
+                  gap: '1rem',
+                  height: '100%',
+                  boxSizing: 'border-box'
+                }}
+              >
+                <Box sx={{ flex: 1, display: 'flex' }}>
+                  <LocationOnIcon
+                    sx={{
+                      marginTop: '0.25rem',
+                      color: 'primary.main',
+                      fontSize: 20
+                    }}
+                  />
+                  <Box>
+                    <Typography variant="h2">{city.name}</Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: 'text.secondary',
+                        mt: 0.5
+                      }}
+                    >
+                      {city.timezone}
+                    </Typography>
+                  </Box>
+                </Box>
 
-export default Home
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-end'
+                  }}
+                >
+                  <ArrowForwardIcon sx={{ color: 'primary.main' }} />
+                </Box>
+              </CardContent>
+            </Card>
+          ))}
+        </Box>
+      </Box>
+    </PageWrapper>
+  )
+}
+
+export default HomePage
