@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
-import WeatherDetails from '@/app/weather/[city]/[days]/components/WeatherDetails'
+import WeatherDetails from '@/components/WeatherDetails/WeatherDetails'
 import { getWeather } from '@/server/weather/open-meteo'
 
 export const generateMetadata = async ({
@@ -45,18 +45,14 @@ const WeatherPage = async ({ params }: TProps) => {
   try {
     weather = await getWeather(city, days)
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Something went wrong.'
+    const isError = error instanceof Error
 
-    return (
-      <>
-        <h1>Weather</h1>
+    if (isError && error.message === `City "${city}" was not found.`) {
+      notFound()
+    }
 
-        <p>{message}</p>
-
-        <a href={`/weather/${city}/${days}`}>Try again</a>
-      </>
-    )
+    const message = isError ? error.message : 'Something went wrong.'
+    throw new Error(message)
   }
 
   return <WeatherDetails city={city} weather={weather} />

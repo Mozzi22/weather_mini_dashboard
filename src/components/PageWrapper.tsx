@@ -20,6 +20,7 @@ const PageWrapper = ({ children }: TProps) => (
         padding: '2rem',
         marginX: '1rem',
         borderRadius: '1rem',
+        backgroundColor: 'background.default',
         boxShadow: { sx: 'none', sm: CARD_SHADOW }
       }}
     >

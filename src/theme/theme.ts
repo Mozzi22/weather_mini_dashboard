@@ -102,6 +102,13 @@ export const theme = createTheme({
             width: '350px'
           }
         }
+      },
+      defaultProps: {
+        slotProps: {
+          inputLabel: {
+            shrink: true
+          }
+        }
       }
     }
   },

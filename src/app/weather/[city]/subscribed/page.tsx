@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
+import { notFound } from 'next/navigation'
 
-import SubscribedCard from '@/app/weather/[city]/subscribed/components/SubscribedCard'
-import WithoutSubscribe from '@/app/weather/[city]/subscribed/components/WithoutSubscribe'
+import SubscribedCard from '@/components/SubscribedCard'
+import WithoutSubscribe from '@/components/WithoutSubscribe'
 import { getNextForecastTime } from '@/helpers/getNextForecastTime'
 import {
   subscriptionSchema,
@@ -33,8 +34,7 @@ const SubscribedPage = async ({ params }: TProps) => {
   const { city } = await params
 
   const weatherData = await getCityWeather(city)
-  // todo page
-  if (!weatherData) return <>City {city} was not found.</>
+  if (!weatherData) return notFound()
 
   const cookieStore = await cookies()
   const cookieData = cookieStore.get(weatherData.id.toString())?.value

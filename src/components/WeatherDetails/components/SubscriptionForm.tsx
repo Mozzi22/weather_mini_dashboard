@@ -74,6 +74,7 @@ const SubscriptionForm = ({ id, city }: TProps) => {
           <input type="hidden" {...register('city')} />
           <TextField
             label="Name"
+            placeholder="Taras Petrenko"
             {...register('name')}
             error={!!errors.name || !!serverErrors?.name}
             helperText={errors.name?.message ?? serverErrors?.name?.[0]}
@@ -89,6 +90,7 @@ const SubscriptionForm = ({ id, city }: TProps) => {
           />
           <TextField
             label="Postal code"
+            placeholder="01054"
             {...register('postalCode')}
             error={!!errors.postalCode || !!serverErrors?.postalCode}
             helperText={

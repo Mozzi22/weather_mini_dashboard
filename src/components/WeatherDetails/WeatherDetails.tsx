@@ -6,13 +6,13 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Fragment } from 'react'
 
-import DaysSelect from '@/app/weather/[city]/[days]/components/DaysSelect'
-import SubscriptionForm from '@/app/weather/[city]/[days]/components/SubscriptionForm'
 import PageWrapper from '@/components/PageWrapper'
+import DaysSelect from '@/components/WeatherDetails/components/DaysSelect'
+import SubscriptionForm from '@/components/WeatherDetails/components/SubscriptionForm'
 import { formatCurrentTime } from '@/helpers/formatCurrentTime'
 import { formatForecastDate } from '@/helpers/formatForecastDate'
 import { getWeatherDescription } from '@/server/weather/helpers/getWeatherDescription'
-import { TWeatherData } from '@/server/weather/types'
+import { TWeatherData } from '@/types/OpenMeteo'
 
 type TProps = {
   city: string

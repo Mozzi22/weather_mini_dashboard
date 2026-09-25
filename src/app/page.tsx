@@ -1,28 +1,36 @@
 'use client'
 
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
-import LocationOnIcon from '@mui/icons-material/LocationOn'
-import { Box, Card, CardContent, Typography } from '@mui/material'
-import Link from 'next/link'
+import { Box, Typography } from '@mui/material'
+import { useEffect, useState } from 'react'
 
+import CityCard from '@/components/CityCard/CityCard'
 import PageWrapper from '@/components/PageWrapper'
+import { CITIES } from '@/utils/constants/cities'
 
-const CITIES = [
-  {
-    name: 'Kyiv',
-    timezone: 'Europe/Kyiv'
-  },
-  {
-    name: 'Kamyanets-Podilskyi',
-    timezone: 'Europe/Kyiv'
-  },
-  {
-    name: 'Toronto',
-    timezone: 'America/Toronto'
-  }
-]
+const FAVORITE_CITY_KEY = 'favorite-city'
 
 const HomePage = () => {
+  const [favoriteCity, setFavoriteCity] = useState<string | null>(null)
+
+  useEffect(() => {
+    const savedCity = localStorage.getItem(FAVORITE_CITY_KEY)
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFavoriteCity(savedCity)
+  }, [])
+
+  const handleToggle = (city: string, isFavorite: boolean) => {
+    if (isFavorite) {
+      localStorage.removeItem(FAVORITE_CITY_KEY)
+      setFavoriteCity(null)
+
+      return
+    }
+
+    localStorage.setItem(FAVORITE_CITY_KEY, city)
+    setFavoriteCity(city)
+  }
+
   return (
     <PageWrapper>
       <Box
@@ -51,58 +59,18 @@ const HomePage = () => {
             gap: '1.5rem'
           }}
         >
-          {CITIES.map((city) => (
-            <Card
-              key={city.name}
-              component={Link}
-              href={`/weather/${encodeURIComponent(city.name)}/3`}
-              sx={{
-                '&:hover': {
-                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)'
-                }
-              }}
-            >
-              <CardContent
-                sx={{
-                  display: 'flex',
-                  gap: '1rem',
-                  height: '100%',
-                  boxSizing: 'border-box'
-                }}
-              >
-                <Box sx={{ flex: 1, display: 'flex' }}>
-                  <LocationOnIcon
-                    sx={{
-                      marginTop: '0.25rem',
-                      color: 'primary.main',
-                      fontSize: 20
-                    }}
-                  />
-                  <Box>
-                    <Typography variant="h2">{city.name}</Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'text.secondary',
-                        mt: 0.5
-                      }}
-                    >
-                      {city.timezone}
-                    </Typography>
-                  </Box>
-                </Box>
+          {CITIES.map((city) => {
+            const isFavorite = favoriteCity === city.name
 
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'flex-end'
-                  }}
-                >
-                  <ArrowForwardIcon sx={{ color: 'primary.main' }} />
-                </Box>
-              </CardContent>
-            </Card>
-          ))}
+            return (
+              <CityCard
+                key={`${city.name}-${isFavorite}`}
+                isFavorite={isFavorite}
+                city={city}
+                onToggle={() => handleToggle(city.name, isFavorite)}
+              />
+            )
+          })}
         </Box>
       </Box>
     </PageWrapper>
