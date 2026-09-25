@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+### Як запустити проєкт
 
-## Getting Started
+Встановіть залежності:
 
-First, run the development server:
+```bash
+npm install
+```
+
+Створіть .env.local базуючись на .env.example
+
+Запустіть сервер розробки:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Відкрийте [http://localhost:3000](http://localhost:3000) в браузері щоб побачити результат.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Які бібліотеки обрали і чому (коротко)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+dayjs - для зручної роботи з датами
 
-## Learn More
+react-simple-timefield - для спрощення роботи з полями для часу
 
-To learn more about Next.js, take a look at the following resources:
+husky - для контролю pull requests
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+eslint + prettier - для конролю стилізації
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+jest - для тестування
 
-## Deploy on Vercel
+### Де використано Server Actions, де Route Handlers і чому
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Server Action - у формі для підписки, дозволяє без використання додаткового API зберегти дані.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+На сервері є логіка перевірки правильності надісланих даних, перевірка чи в користувача ще немає підписки до обраного міста, збереження підписки та редірект до сторінки підтвердження підписки.
+
+`Завдання 2.2. Server Actions і Route Handlers` - Якби замість Server Action використати Route Handler, потрібно було б використовувати окремий ендпоінт, наприклад /api/subscription, і виконувати запит із форми до нього. Це додало б додатковий шар API для збереження, яке використовується лише всередині цього сайту.
+
+- Route Handlers - дані про місто та погоду, дозволяє перевірити та виконати запит на сервері.
+
+Дозволяємо обробляти запити до Open-Meteo на сервері та не використовуємо прямі виклики Open-Meteo з боку браузера.
+
+`Завдання 2.2. Server Actions і Route Handlers` - Якби замість Route Handler використати Server Action, запит до Open-Meteo все одно можна було б виконувати на сервері, але логіка роботи з погодою була б привʼязана до Server Action і окремий HTTP запит для отримання даних був би відсутній.
+
+### Як відтворити недоступність або повільну відповідь Open-Meteo
+
+- Імітація повільної відповіді
+
+Щоб імітувати повільну відповідь Open-Meteo під час локального тестування, змініть вашу змінну `OPEN_METEO_TIMEOUT` в .env.local на бажану кількість часу, до прикладу 10.
+
+- Відтворення недоступності
+
+Щоб відтворити недоступність Open-Meteo під час локального тестування, змініть вашу змінну `OPEN_METEO_API_URL` або ж `OPEN_METEO_GEOCODING_URL` в .env.local на бажане посилання, до прикладу http://localhost:9999/forecast.
+
+### Фактично витрачений час
+
+Близько 25 годин.
+
+### Що зроблено
+
+Виконані всі три рівні з технічного завдання.
+
+### Що не зроблено або зроблено інакше, ніж просили, і чому
+
+Мова застосунку обрана англійська, але утверджена з компанією. З моїх особистих побажань - не витрачала зайвий час, тому не додала бібліотеку для перекладів, але вважаю, що це гарна практика.
+
+
+### Кешування прогнозу на сервері на 5 хвилин і пояснення в README, що кешується, а що ні:
+
+Запити до Open-Meteo кешуються на сервері протягом 5 хвилин за допомогою `revalidate: 300`. Для різних міст або періодів прогнозу створюються окремі записи в кеші.
+
+Кешуються:
+- Відповіді Open-Meteo з прогнозом погоди — 5 хвилин
+- Відповіді Open-Meteo з геокодування — 5 хвилин (пошук міста)
+
+Не кешуються:
+- Підписки на отримання сповіщень
+- Вибір улюбленого міста
