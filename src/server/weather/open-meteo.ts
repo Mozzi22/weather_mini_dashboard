@@ -4,11 +4,14 @@ import { weatherResponseSchema } from '@/schemas/weatherResponse'
 import { getWeatherDescription } from '@/server/weather/helpers/getWeatherDescription'
 import { TWeatherData } from '@/types/OpenMeteo'
 
-const fetchWithTimeout = async (url: string): Promise<Response> => {
+const fetchWithTimeout = async (
+  url: string,
+  options?: RequestInit
+): Promise<Response> => {
   try {
     return await fetch(url, {
-      signal: AbortSignal.timeout(env.OPEN_METEO_TIMEOUT),
-      cache: 'no-store'
+      ...options,
+      signal: AbortSignal.timeout(env.OPEN_METEO_TIMEOUT)
     })
   } catch (error) {
     if (error instanceof DOMException && error.name === 'TimeoutError')
@@ -26,7 +29,12 @@ export const getCityWeather = async (city: string) => {
     format: 'json'
   })
   const geocodingResponse = await fetchWithTimeout(
-    `${env.OPEN_METEO_GEOCODING_URL}?${searchParams}`
+    `${env.OPEN_METEO_GEOCODING_URL}?${searchParams}`,
+    {
+      next: {
+        revalidate: 300
+      }
+    }
   )
 
   const data: unknown = await geocodingResponse.json()
@@ -69,7 +77,12 @@ export const getWeather = async (
   })
 
   const weatherResponse = await fetchWithTimeout(
-    `${env.OPEN_METEO_API_URL}?${weatherParams}`
+    `${env.OPEN_METEO_API_URL}?${weatherParams}`,
+    {
+      next: {
+        revalidate: 300
+      }
+    }
   )
 
   const data: unknown = await weatherResponse.json()
