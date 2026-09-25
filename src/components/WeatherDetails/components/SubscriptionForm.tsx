@@ -27,6 +27,7 @@ const SubscriptionForm = ({ id, city }: TProps) => {
     register,
     handleSubmit,
     control,
+    setValue,
     formState: { errors }
   } = useForm<TSubscriptionFormData>({
     resolver: zodResolver(subscriptionSchema),
@@ -84,6 +85,16 @@ const SubscriptionForm = ({ id, city }: TProps) => {
             label="Phone"
             placeholder="+380XXXXXXXXX"
             {...register('phone')}
+            slotProps={{
+              htmlInput: {
+                inputMode: 'tel'
+              }
+            }}
+            onFocus={(event) => {
+              if (!event.target.value) {
+                setValue('phone', '+380')
+              }
+            }}
             error={!!errors.phone || !!serverErrors?.phone}
             helperText={errors.phone?.message ?? serverErrors?.phone?.[0]}
             disabled={isSubmitting}
@@ -92,6 +103,11 @@ const SubscriptionForm = ({ id, city }: TProps) => {
             label="Postal code"
             placeholder="01054"
             {...register('postalCode')}
+            slotProps={{
+              htmlInput: {
+                inputMode: 'numeric'
+              }
+            }}
             error={!!errors.postalCode || !!serverErrors?.postalCode}
             helperText={
               errors.postalCode?.message ?? serverErrors?.postalCode?.[0]
