@@ -1,20 +1,13 @@
-import { isValidWeatherResponse } from '@/server/weather/helpers/getIsValidWeatherResponse'
+import { env } from '@/schemas/env'
+import { geocodingResponseSchema } from '@/schemas/geocodingResponse'
+import { weatherResponseSchema } from '@/schemas/weatherResponse'
 import { getWeatherDescription } from '@/server/weather/helpers/getWeatherDescription'
-import {
-  TGeocodingResponse,
-  TOpenMeteoResponse,
-  TWeatherData
-} from '@/server/weather/types'
-
-const GEOCODING_API = 'https://geocoding-api.open-meteo.com/v1/search'
-const WEATHER_API = 'https://api.open-meteo.com/v1/forecast'
-
-const REQUEST_TIMEOUT = 5000
+import { TWeatherData } from '@/types/OpenMeteo'
 
 const fetchWithTimeout = async (url: string): Promise<Response> => {
   try {
     return await fetch(url, {
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT),
+      signal: AbortSignal.timeout(env.OPEN_METEO_TIMEOUT),
       cache: 'no-store'
     })
   } catch (error) {
@@ -33,10 +26,15 @@ export const getCityWeather = async (city: string) => {
     format: 'json'
   })
   const geocodingResponse = await fetchWithTimeout(
-    `${GEOCODING_API}?${searchParams}`
+    `${env.OPEN_METEO_GEOCODING_URL}?${searchParams}`
   )
 
-  const geocodingData = (await geocodingResponse.json()) as TGeocodingResponse
+  const data: unknown = await geocodingResponse.json()
+  const result = geocodingResponseSchema.safeParse(data)
+  if (!result.success) {
+    throw new Error('Weather service returned data in an unexpected format.')
+  }
+  const geocodingData = result.data
 
   return geocodingData.results?.[0]
 }
@@ -71,18 +69,20 @@ export const getWeather = async (
   })
 
   const weatherResponse = await fetchWithTimeout(
-    `${WEATHER_API}?${weatherParams}`
+    `${env.OPEN_METEO_API_URL}?${weatherParams}`
   )
 
-  const weatherData = (await weatherResponse.json()) as TOpenMeteoResponse
-
-  if (!isValidWeatherResponse(weatherData, days)) {
+  const data: unknown = await weatherResponse.json()
+  const result = weatherResponseSchema.safeParse(data)
+  if (!result.success) {
     throw new Error('Weather service returned data in an unexpected format.')
   }
+  const weatherData = result.data
 
   const { current, daily } = weatherData
 
   return {
+    id: location.id,
     city: location.name,
     current: {
       temperature: Math.round(current.temperature_2m!),
@@ -98,8 +98,6 @@ export const getWeather = async (
       maxTemperature: Math.round(daily.temperature_2m_max[index]),
       precipitationProbability: daily.precipitation_probability_max[index],
       weatherCode: getWeatherDescription(daily.weather_code[index], true).icon
-    })),
-    latitude: String(location.latitude),
-    longitude: String(location.longitude)
+    }))
   }
 }

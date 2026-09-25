@@ -31,9 +31,9 @@ export const subscribe = async (
 
   await new Promise((resolve) => setTimeout(resolve, 1500))
 
-  const { city, phone, latitude, longitude } = result.data
+  const { city, phone, id } = result.data
 
-  if (isSubscribed(phone, latitude, longitude)) {
+  if (isSubscribed(phone, id)) {
     return {
       errors: {
         phone: ['This phone is already subscribed to this city.']
@@ -45,7 +45,7 @@ export const subscribe = async (
   saveSubscription(result.data)
 
   const cookieStore = await cookies()
-  const cookieKey = `sub_${encodeURIComponent(city.trim().toLowerCase())}`
+  const cookieKey = `sub_${id}`
   cookieStore.set(cookieKey, JSON.stringify(result.data), {
     path: '/',
     maxAge: 60 * 60 * 24 * 7,

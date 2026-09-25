@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
+import { notFound } from 'next/navigation'
 
-import SubscribedCard from '@/app/weather/[city]/subscribed/components/SubscribedCard'
-import WithoutSubscribe from '@/app/weather/[city]/subscribed/components/WithoutSubscribe'
+import SubscribedCard from '@/components/SubscribedCard'
+import WithoutSubscribe from '@/components/WithoutSubscribe'
 import { getNextForecastTime } from '@/helpers/getNextForecastTime'
 import {
   subscriptionSchema,
@@ -31,12 +32,12 @@ type TProps = {
 
 const SubscribedPage = async ({ params }: TProps) => {
   const { city } = await params
-  const rawCity = decodeURIComponent(city)
-  const normalizedCity = rawCity.trim().toLowerCase()
+
+  const weatherData = await getCityWeather(city)
+  if (!weatherData) return notFound()
 
   const cookieStore = await cookies()
-  const cookieKey = `sub_${encodeURIComponent(normalizedCity)}`
-  const cookieData = cookieStore.get(cookieKey)?.value
+  const cookieData = cookieStore.get(weatherData.id.toString())?.value
 
   let subscription: TSubscriptionFormData | undefined
   if (cookieData) {
@@ -45,22 +46,16 @@ const SubscribedPage = async ({ params }: TProps) => {
 
       const result = subscriptionSchema.safeParse(parsed)
 
-      if (result.success) {
-        subscription = result.data
-      }
+      if (result.success) subscription = result.data
     } catch {
       // Ignore invalid cookie
     }
   }
 
   if (!subscription) {
-    subscription = getSubscription(normalizedCity)
+    subscription = getSubscription(weatherData.id)
   }
 
-  const weatherData = await getCityWeather(city)
-
-  // todo page
-  if (!weatherData) return <>City {city} was not found.</>
   if (!subscription) return <WithoutSubscribe city={weatherData.name} />
 
   const nextForecast = getNextForecastTime(

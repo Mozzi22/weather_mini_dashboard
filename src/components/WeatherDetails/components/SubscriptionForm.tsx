@@ -13,12 +13,11 @@ import {
 } from '@/schemas/subscription'
 
 type TProps = {
+  id: number
   city: string
-  latitude: string
-  longitude: string
 }
 
-const SubscriptionForm = ({ city, latitude, longitude }: TProps) => {
+const SubscriptionForm = ({ id, city }: TProps) => {
   const [serverErrors, setServerErrors] = useState<
     TSubscriptionState['errors']
   >({})
@@ -28,12 +27,12 @@ const SubscriptionForm = ({ city, latitude, longitude }: TProps) => {
     register,
     handleSubmit,
     control,
+    setValue,
     formState: { errors }
   } = useForm<TSubscriptionFormData>({
     resolver: zodResolver(subscriptionSchema),
     defaultValues: {
-      latitude,
-      longitude,
+      id,
       city,
       name: '',
       phone: '',
@@ -72,11 +71,11 @@ const SubscriptionForm = ({ city, latitude, longitude }: TProps) => {
             rowGap: '1rem'
           }}
         >
+          <input type="hidden" {...register('id')} />
           <input type="hidden" {...register('city')} />
-          <input type="hidden" {...register('latitude')} />
-          <input type="hidden" {...register('longitude')} />
           <TextField
             label="Name"
+            placeholder="Taras Petrenko"
             {...register('name')}
             error={!!errors.name || !!serverErrors?.name}
             helperText={errors.name?.message ?? serverErrors?.name?.[0]}
@@ -86,13 +85,29 @@ const SubscriptionForm = ({ city, latitude, longitude }: TProps) => {
             label="Phone"
             placeholder="+380XXXXXXXXX"
             {...register('phone')}
+            slotProps={{
+              htmlInput: {
+                inputMode: 'tel'
+              }
+            }}
+            onFocus={(event) => {
+              if (!event.target.value) {
+                setValue('phone', '+380')
+              }
+            }}
             error={!!errors.phone || !!serverErrors?.phone}
             helperText={errors.phone?.message ?? serverErrors?.phone?.[0]}
             disabled={isSubmitting}
           />
           <TextField
             label="Postal code"
+            placeholder="01054"
             {...register('postalCode')}
+            slotProps={{
+              htmlInput: {
+                inputMode: 'numeric'
+              }
+            }}
             error={!!errors.postalCode || !!serverErrors?.postalCode}
             helperText={
               errors.postalCode?.message ?? serverErrors?.postalCode?.[0]
